@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Avaliação de Estadia — Ria Endless South</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --gold: #B8924A;
+      --gold-light: #F5EDD8;
+      --gold-dark: #7A5E2E;
+      --bg: #FAFAF8;
+      --card: #FFFFFF;
+      --ink: #1C1C1A;
+      --muted: #7A7A72;
+      --border: rgba(0,0,0,0.10);
+      --surface: #F3F1EC;
+      --radius: 8px;
+      --radius-lg: 12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+
+    .page {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem 5rem;
+    }
+
+    /* HEADER */
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+      padding-bottom: 2rem;
+      border-bottom: 0.5px solid var(--border);
+    }
+
+    .header .eyebrow {
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.75rem;
+    }
+
+    .header h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 32px;
+      color: var(--ink);
+      line-height: 1.25;
+      margin-bottom: 0.5rem;
+    }
+
+    .header .sub {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 15px;
+      font-style: italic;
+      color: var(--muted);
+    }
+
+    /* PROGRESS */
+    .progress-bar {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 2.5rem;
+    }
+
+    .progress-bar .seg {
+      height: 3px;
+      flex: 1;
+      border-radius: 2px;
+      background: var(--surface);
+      transition: background 0.4s;
+    }
+
+    .progress-bar .seg.done { background: var(--gold); }
+    .progress-bar .seg.active { background: var(--gold); opacity: 0.45; }
+
+    /* SECTIONS */
+    .section { display: none; }
+    .section.active { display: block; }
+
+    .section-label {
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.4rem;
+    }
+
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 24px;
+      font-weight: 400;
+      color: var(--ink);
+      margin-bottom: 0.4rem;
+    }
+
+    .section-desc {
+      font-size: 13.5px;
+      color: var(--muted);
+      line-height: 1.65;
+      margin-bottom: 2.5rem;
+    }
+
+    /* FIELDS */
+    .field { margin-bottom: 2rem; }
+
+    .field label {
+      display: block;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--ink);
+      margin-bottom: 0.5rem;
+      line-height: 1.4;
+    }
+
+    .field label .req { color: var(--gold); margin-left: 2px; }
+
+    .field .hint {
+      font-size: 12px;
+      color: var(--muted);
+      font-style: italic;
+      margin-bottom: 0.6rem;
+      line-height: 1.5;
+    }
+
+    /* TEXT INPUTS */
+    input[type="text"],
+    input[type="email"],
+    textarea {
+      width: 100%;
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--card);
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      padding: 11px 14px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+
+    textarea { min-height: 95px; resize: vertical; line-height: 1.65; }
+
+    input:focus, textarea:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(184,146,74,0.1);
+    }
+
+    /* STARS */
+    .star-row { display: flex; gap: 7px; align-items: center; }
+
+    .star-row .star {
+      width: 36px; height: 36px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 50%;
+      border: 0.5px solid var(--border);
+      background: var(--card);
+      font-size: 17px;
+      color: var(--muted);
+      transition: all 0.2s;
+      user-select: none;
+    }
+
+    .star-row .star.lit { background: var(--gold-light); border-color: var(--gold); color: var(--gold-dark); }
+    .star-row .star:hover { border-color: var(--gold); }
+    .star-label { font-size: 12px; color: var(--muted); margin-left: 10px; min-width: 80px; }
+
+    /* SMILEY OPTIONS */
+    .smiley-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .smiley-opt {
+      cursor: pointer;
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 10px 18px;
+      font-size: 13px;
+      color: var(--muted);
+      background: var(--card);
+      display: flex; align-items: center; gap: 7px;
+      transition: all 0.2s;
+    }
+
+    .smiley-opt.sel {
+      border-color: var(--gold);
+      background: var(--gold-light);
+      color: var(--gold-dark);
+      font-weight: 500;
+    }
+
+    /* CHECKBOXES */
+    .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+    .check-item {
+      display: flex; align-items: center; gap: 10px;
+      cursor: pointer;
+      padding: 10px 13px;
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--card);
+      font-size: 13px; color: var(--ink);
+      transition: all 0.2s;
+    }
+
+    .check-item.sel { border-color: var(--gold); background: var(--gold-light); color: var(--gold-dark); }
+
+    .check-box {
+      width: 17px; height: 17px;
+      border: 0.5px solid var(--border);
+      border-radius: 4px;
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; color: var(--gold);
+      background: var(--card);
+    }
+
+    .check-item.sel .check-box { background: var(--gold); border-color: var(--gold); color: white; }
+
+    /* NPS */
+    .nps-row { display: flex; gap: 5px; flex-wrap: wrap; }
+
+    .nps-btn {
+      width: 44px; height: 44px;
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--card);
+      cursor: pointer;
+      font-size: 13px; font-weight: 500; color: var(--muted);
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .nps-btn.sel { background: var(--gold); border-color: var(--gold); color: white; }
+    .nps-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-top: 7px; }
+
+    /* REVIEW BOX */
+    .review-box {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 1.4rem;
+      margin-bottom: 2rem;
+      border: 0.5px solid var(--border);
+    }
+
+    .review-box .rtitle {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 16px; font-weight: 500;
+      margin-bottom: 0.4rem; color: var(--ink);
+    }
+
+    .review-box .rdesc {
+      font-size: 12.5px; color: var(--muted);
+      line-height: 1.65; margin-bottom: 1rem;
+    }
+
+    /* CONSENT */
+    .consent-row {
+      display: flex; align-items: flex-start; gap: 11px;
+      padding: 14px;
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--card);
+      cursor: pointer; margin-bottom: 9px;
+      transition: all 0.2s;
+    }
+
+    .consent-row.sel { border-color: var(--gold); background: var(--gold-light); }
+
+    .consent-row .cbox {
+      width: 18px; height: 18px;
+      border: 0.5px solid var(--border);
+      border-radius: 4px; flex-shrink: 0; margin-top: 1px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; background: var(--card); color: var(--gold);
+    }
+
+    .consent-row.sel .cbox { background: var(--gold); border-color: var(--gold); color: white; }
+    .consent-row .ctext { font-size: 13px; color: var(--ink); line-height: 1.55; }
+    .consent-row .ctext strong { font-weight: 500; }
+
+    /* NAVIGATION */
+    .nav-row {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 2.5rem; padding-top: 1.5rem;
+      border-top: 0.5px solid var(--border);
+    }
+
+    .btn {
+      padding: 11px 26px;
+      border-radius: var(--radius);
+      font-size: 14px; font-weight: 500;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 0.5px solid var(--border);
+      background: var(--card); color: var(--ink);
+    }
+
+    .btn:hover { border-color: var(--gold); }
+    .btn-primary { background: var(--gold); border-color: var(--gold); color: white; }
+    .btn-primary:hover { background: var(--gold-dark); border-color: var(--gold-dark); }
+
+    .step-count { font-size: 12px; color: var(--muted); }
+
+    /* SENDING STATE */
+    .sending-msg {
+      display: none;
+      text-align: center;
+      padding: 3rem 1rem;
+    }
+
+    .sending-msg p { font-size: 14px; color: var(--muted); }
+
+    /* THANK YOU */
+    .thankyou {
+      display: none;
+      text-align: center;
+      padding: 4rem 1rem;
+    }
+
+    .thankyou .icon {
+      width: 60px; height: 60px;
+      border-radius: 50%;
+      background: var(--gold-light);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1.5rem;
+      font-size: 24px; color: var(--gold-dark);
+    }
+
+    .thankyou h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 28px; font-weight: 400;
+      margin-bottom: 0.75rem; color: var(--ink);
+    }
+
+    .thankyou p {
+      font-size: 14px; color: var(--muted);
+      line-height: 1.75; max-width: 500px;
+      margin: 0 auto 1rem;
+      text-wrap: balance;
+    }
+
+    /* FOOTER */
+    .footer {
+      text-align: center;
+      margin-top: 4rem;
+      padding-top: 2rem;
+      border-top: 0.5px solid var(--border);
+      font-size: 12px;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    @media (max-width: 480px) {
+      .check-grid { grid-template-columns: 1fr; }
+      .nps-btn { width: 36px; height: 36px; font-size: 12px; }
+      .header h1 { font-size: 26px; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="eyebrow">Alojamento Local · Cabanas de Tavira</div>
+    <h1>Ria Endless South</h1>
+    <div class="sub">Como foi a sua estadia?</div>
+  </div>
+
+  <div class="progress-bar" id="progress"></div>
+
+  <div id="form-wrap">
+
+    <!-- SECÇÃO 1: Identificação -->
+    <div class="section active" id="sec-0">
+      <div class="section-label">Secção 1 / 6</div>
+      <div class="section-title">Sobre a sua visita</div>
+      <div class="section-desc">Diga-nos um pouco sobre quem veio e quando ficou. Este questionário pode ser preenchido por vários elementos do grupo — cada um com o seu nome e email, identificando as mesmas datas de entrada e saída.</div>
+
+      <div class="field">
+        <label>Nome <span class="req">*</span></label>
+        <input type="text" id="nome" placeholder="O seu nome">
+      </div>
+      <div class="field">
+        <label>Email (opcional — para envio do resumo)</label>
+        <input type="email" id="email" placeholder="o.seu@email.com">
+      </div>
+      <div class="field">
+        <label>Data de entrada <span class="req">*</span></label>
+        <input type="text" id="data_entrada" placeholder="ex: 10 de Agosto 2025">
+      </div>
+      <div class="field">
+        <label>Data de saída <span class="req">*</span></label>
+        <input type="text" id="data_saida" placeholder="ex: 17 de Agosto 2025">
+      </div>
+      <div class="field">
+        <label>Tipo de grupo</label>
+        <div class="smiley-row" id="tipo-grupo">
+          <div class="smiley-opt" data-v="casal">♥ Casal</div>
+          <div class="smiley-opt" data-v="familia">Família</div>
+          <div class="smiley-opt" data-v="amigos">Amigos</div>
+          <div class="smiley-opt" data-v="solo">Solo</div>
+          <div class="smiley-opt" data-v="trabalho">Trabalho</div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Número de noites</label>
+        <input type="text" id="noites" placeholder="ex: 5 noites">
+      </div>
+    </div>
+
+    <!-- SECÇÃO 2: Espaço -->
+    <div class="section" id="sec-1">
+      <div class="section-label">Secção 2 / 6</div>
+      <div class="section-title">O espaço</div>
+      <div class="section-desc">Avalie os diferentes espaços da moradia de 1 (muito fraco) a 5 (excelente).</div>
+
+      <div class="field">
+        <label>Quartos (conforto, limpeza, cama)</label>
+        <div class="star-row" data-group="quartos">
+          <div class="star" data-v="1">★</div><div class="star" data-v="2">★</div><div class="star" data-v="3">★</div><div class="star" data-v="4">★</div><div class="star" data-v="5">★</div>
+          <span class="star-label" id="lbl-quartos"></span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Casas de banho (limpeza, equipamento)</label>
+        <div class="star-row" data-group="wc">
+          <div class="star" data-v="1">★</div><div class="star" data-v="2">★</div><div class="star" data-v="3">★</div><div class="star" data-v="4">★</div><div class="star" data-v="5">★</div>
+          <span class="star-label" id="lbl-wc"></span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Cozinha (equipamento, utensílios)</label>
+        <div class="star-row" data-group="cozinha">
+          <div class="star" data-v="1">★</div><div class="star" data-v="2">★</div><div class="star" data-v="3">★</div><div class="star" data-v="4">★</div><div class="star" data-v="5">★</div>
+          <span class="star-label" id="lbl-cozinha"></span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Sala de estar</label>
+        <div class="hint">ex: conforto, televisão, livros, jogos, facilidades disponíveis</div>
+        <div class="star-row" data-group="sala">
+          <div class="star" data-v="1">★</div><div class="star" data-v="2">★</div><div class="star" data-v="3">★</div><div class="star" data-v="4">★</div><div class="star" data-v="5">★</div>
+          <span class="star-label" id="lbl-sala"></span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Varandas (1.º piso)</label>
+        <div class="star-row" data-group="varandas">
+          <div class="star" data-v="1">★</div><div class="star" data-v="2">★</div><div class="star" data-v="3">★</div><div class="star" data-v="4">★</div><div class="star" data-v="5">★</div>
+          <span class="star-label" id="lbl-varandas"></span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Alpendre e pátio (rés-do-chão)</label>
+        <div class="star-row" data-group="patio">
+          <div class="star" data-v="1">★</div><div class="star" data-v="2">★</div><div class="star" data-v="3">★</div><div class="star" data-v="4">★</div><div class="star" data-v="5">★</div>
+          <span class="star-label" id="lbl-patio"></span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Estacionamento</label>
+        <div class="star-row" data-group="estacionamento">
+          <div class="star" data-v="1">★</div><div class="star" data-v="2">★</div><div class="star" data-v="3">★</div><div class="star" data-v="4">★</div><div class="star" data-v="5">★</div>
+          <span class="star-label" id="lbl-estacionamento"></span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Limpeza geral da casa</label>
+        <div class="star-row" data-group="limpeza">
+          <div class="star" data-v="1">★</div><div class="star" data-v="2">★</div><div class="star" data-v="3">★</div><div class="star" data-v="4">★</div><div class="star" data-v="5">★</div>
+          <span class="star-label" id="lbl-limpeza"></span>
+        </div>
+      </div>
+      <div class="field">
+        <label>O que mais gostou no espaço? O que poderia ser melhorado?</label>
+        <textarea id="esp_obs" placeholder="Partilhe a sua opinião sobre a moradia..."></textarea>
+      </div>
+    </div>
+
+    <!-- SECÇÃO 3: Serviço e Comunicação -->
+    <div class="section" id="sec-2">
+      <div class="section-label">Secção 3 / 6</div>
+      <div class="section-title">Serviço e comunicação</div>
+      <div class="section-desc">A forma como é recebido e apoiado é tão importante quanto o espaço em si.</div>
+
+      <div class="field">
+        <label>Acessibilidade e facilidade de chegar ao alojamento</label>
+        <div class="star-row" data-group="acessibilidade">
+          <div class="star" data-v="1">★</div><div class="star" data-v="2">★</div><div class="star" data-v="3">★</div><div class="star" data-v="4">★</div><div class="star" data-v="5">★</div>
+          <span class="star-label" id="lbl-acessibilidade"></span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Processo de check-in (facilidade, clareza das instruções)</label>
+        <div class="star-row" data-group="checkin">
+          <div class="star" data-v="1">★</div><div class="star" data-v="2">★</div><div class="star" data-v="3">★</div><div class="star" data-v="4">★</div><div class="star" data-v="5">★</div>
+          <span class="star-label" id="lbl-checkin"></span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Processo de check-out (clareza, simplicidade)</label>
+        <div class="star-row" data-group="checkout">
+          <div class="star" data-v="1">★</div><div class="star" data-v="2">★</div><div class="star" data-v="3">★</div><div class="star" data-v="4">★</div><div class="star" data-v="5">★</div>
+          <span class="star-label" id="lbl-checkout"></span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Necessitou de assistência ou contacto durante a estadia?</label>
+        <div class="smiley-row" id="usou-assistencia">
+          <div class="smiley-opt" data-v="sim">Sim, necessitei</div>
+          <div class="smiley-opt" data-v="nao">Não foi necessário</div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Se sim — rapidez e qualidade da resposta</label>
+        <div class="star-row" data-group="assistencia">
+          <div class="star" data-v="1">★</div><div class="star" data-v="2">★</div><div class="star" data-v="3">★</div><div class="star" data-v="4">★</div><div class="star" data-v="5">★</div>
+          <span class="star-label" id="lbl-assistencia"></span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Informações fornecidas sobre a casa e a região (guia, dicas, sugestões)</label>
+        <div class="star-row" data-group="informacoes">
+          <div class="star" data-v="1">★</div><div class="star" data-v="2">★</div><div class="star" data-v="3">★</div><div class="star" data-v="4">★</div><div class="star" data-v="5">★</div>
+          <span class="star-label" id="lbl-informacoes"></span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Comentários sobre o serviço e comunicação</label>
+        <textarea id="serv_obs" placeholder="O que correu bem? Algo que pudéssemos ter feito melhor?"></textarea>
+      </div>
+    </div>
+
+    <!-- SECÇÃO 4: Natureza -->
+    <div class="section" id="sec-3">
+      <div class="section-label">Secção 4 / 6</div>
+      <div class="section-title">Natureza e percursos</div>
+      <div class="section-desc">A nossa localização privilegiada na Ria Formosa é uma das maiores riquezas desta casa.</div>
+
+      <div class="field">
+        <label>Utilizou o percurso pedestre privativo com vista para a Ria?</label>
+        <div class="smiley-row" id="usou-percurso">
+          <div class="smiley-opt" data-v="sim">Sim, várias vezes</div>
+          <div class="smiley-opt" data-v="uma">Sim, uma vez</div>
+          <div class="smiley-opt" data-v="nao">Não utilizei</div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Se sim — como avalia o percurso pedestre?</label>
+        <div class="star-row" data-group="percurso">
+          <div class="star" data-v="1">★</div><div class="star" data-v="2">★</div><div class="star" data-v="3">★</div><div class="star" data-v="4">★</div><div class="star" data-v="5">★</div>
+          <span class="star-label" id="lbl-percurso"></span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Utilizou o acesso privativo à Ria?</label>
+        <div class="smiley-row" id="usou-acesso">
+          <div class="smiley-opt" data-v="sim">Sim, várias vezes</div>
+          <div class="smiley-opt" data-v="uma">Sim, uma vez</div>
+          <div class="smiley-opt" data-v="nao">Não utilizei</div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Caminhou até Cabanas de Tavira pela Ria (com maré baixa)?</label>
+        <div class="smiley-row" id="caminhou-cabanas">
+          <div class="smiley-opt" data-v="sim">Sim, fiz o percurso</div>
+          <div class="smiley-opt" data-v="nao-mare">Não — maré não favorável</div>
+          <div class="smiley-opt" data-v="nao-outro">Não, por outro motivo</div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Experiência na Ria Formosa no geral</label>
+        <div class="star-row" data-group="ria">
+          <div class="star" data-v="1">★</div><div class="star" data-v="2">★</div><div class="star" data-v="3">★</div><div class="star" data-v="4">★</div><div class="star" data-v="5">★</div>
+          <span class="star-label" id="lbl-ria"></span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Observações sobre os percursos e a natureza</label>
+        <textarea id="nat_obs" placeholder="Momentos memoráveis, sugestões, descobertas..."></textarea>
+      </div>
+    </div>
+
+    <!-- SECÇÃO 5: Satisfação geral -->
+    <div class="section" id="sec-4">
+      <div class="section-label">Secção 5 / 6</div>
+      <div class="section-title">Satisfação geral</div>
+      <div class="section-desc">A sua opinião global é muito importante para nós.</div>
+
+      <div class="field">
+        <label>Classificação global da estadia</label>
+        <div class="star-row" data-group="global">
+          <div class="star" data-v="1">★</div><div class="star" data-v="2">★</div><div class="star" data-v="3">★</div><div class="star" data-v="4">★</div><div class="star" data-v="5">★</div>
+          <span class="star-label" id="lbl-global"></span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Probabilidade de recomendar a familiares ou amigos</label>
+        <div class="hint">0 = nada provável · 10 = certamente recomendaria</div>
+        <div class="nps-row" id="nps">
+          <div class="nps-btn" data-v="0">0</div><div class="nps-btn" data-v="1">1</div><div class="nps-btn" data-v="2">2</div>
+          <div class="nps-btn" data-v="3">3</div><div class="nps-btn" data-v="4">4</div><div class="nps-btn" data-v="5">5</div>
+          <div class="nps-btn" data-v="6">6</div><div class="nps-btn" data-v="7">7</div><div class="nps-btn" data-v="8">8</div>
+          <div class="nps-btn" data-v="9">9</div><div class="nps-btn" data-v="10">10</div>
+        </div>
+        <div class="nps-labels"><span>Não recomendaria</span><span>Recomendaria com certeza</span></div>
+      </div>
+      <div class="field">
+        <label>O que mais utilizou ou apreciou? (pode escolher vários)</label>
+        <div class="check-grid" id="apreciou">
+          <div class="check-item" data-v="percurso"><div class="check-box">✓</div> Percurso pedestre</div>
+          <div class="check-item" data-v="acesso-ria"><div class="check-box">✓</div> Acesso à Ria</div>
+          <div class="check-item" data-v="varandas-vista"><div class="check-box">✓</div> Varandas com vista</div>
+          <div class="check-item" data-v="alpendre"><div class="check-box">✓</div> Alpendre / pátio</div>
+          <div class="check-item" data-v="sossego"><div class="check-box">✓</div> Sossego e tranquilidade</div>
+          <div class="check-item" data-v="cozinha-uso"><div class="check-box">✓</div> Cozinha equipada</div>
+          <div class="check-item" data-v="cabanas"><div class="check-box">✓</div> Proximidade de Cabanas</div>
+          <div class="check-item" data-v="natureza"><div class="check-box">✓</div> Natureza envolvente</div>
+        </div>
+      </div>
+      <div class="field">
+        <label>O que tornou esta estadia especial? O que faria de forma diferente?</label>
+        <textarea id="geral_obs" placeholder="A sua opinião honesta ajuda-nos a melhorar..."></textarea>
+      </div>
+    </div>
+
+    <!-- SECÇÃO 6: Testemunho -->
+    <div class="section" id="sec-5">
+      <div class="section-label">Secção 6 / 6</div>
+      <div class="section-title">Deixe a sua opinião</div>
+      <div class="section-desc">Se desejar, escreva um testemunho sobre a sua estadia. Com a sua autorização, poderemos partilhá-lo nas nossas plataformas.</div>
+
+      <div class="review-box">
+        <div class="rtitle">O seu testemunho</div>
+        <div class="rdesc">Escreva como se estivesse a contar a um amigo. Conte o que fez, o que sentiu, o que o surpreendeu — seja autêntico. Não há respostas certas ou erradas.</div>
+        <textarea id="review_texto" style="min-height:140px;" placeholder="Ex: «Ficámos uma semana em família e foi uma das estadias mais marcantes dos últimos anos. O percurso pela Ria ao entardecer, os pés na água e a vista das varandas ao acordar... impossível de esquecer.»"></textarea>
+      </div>
+
+      <div class="field">
+        <label>Nome a associar ao testemunho (pode usar apenas o primeiro nome)</label>
+        <input type="text" id="review_nome" placeholder="ex: Ana M. · Lisboa">
+      </div>
+
+      <div class="field">
+        <label>Autorização de divulgação</label>
+        <div class="consent-row" id="consent-1" data-v="total">
+          <div class="cbox">✓</div>
+          <div class="ctext"><strong>Autorizo a divulgação total</strong> — pode publicar o meu testemunho, nome e tipo de grupo no website e redes sociais do alojamento.</div>
+        </div>
+        <div class="consent-row" id="consent-2" data-v="parcial">
+          <div class="cbox">✓</div>
+          <div class="ctext"><strong>Autorizo a divulgação sem identificação</strong> — pode usar o meu testemunho mas apenas como «Hóspede», sem nome.</div>
+        </div>
+        <div class="consent-row" id="consent-3" data-v="nao">
+          <div class="cbox">✓</div>
+          <div class="ctext"><strong>Não autorizo a divulgação</strong> — o meu testemunho destina-se apenas a uso interno.</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Já deixou ou tenciona deixar opinião pública nalguma destas plataformas?</label>
+        <div class="hint">O Booking e o Airbnb têm o seu próprio sistema de avaliação — agradecemos se o fizer nessas plataformas também.</div>
+        <div class="check-grid" id="plataformas">
+          <div class="check-item" data-v="google"><div class="check-box">✓</div> Google</div>
+          <div class="check-item" data-v="tripadvisor"><div class="check-box">✓</div> TripAdvisor</div>
+          <div class="check-item" data-v="booking"><div class="check-box">✓</div> Booking.com</div>
+          <div class="check-item" data-v="airbnb"><div class="check-box">✓</div> Airbnb</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Algo que gostasse de nos dizer e ainda não disse?</label>
+        <textarea id="final_obs" placeholder="Sugestão, pedido, curiosidade, mensagem..."></textarea>
+      </div>
+    </div>
+
+  </div><!-- /form-wrap -->
+
+  <div class="sending-msg" id="sending-msg">
+    <p>A enviar a sua avaliação...</p>
+  </div>
+
+  <div class="thankyou" id="thankyou">
+    <div class="icon">✦</div>
+    <h2>Muito obrigado pela sua avaliação</h2>
+    <p>A sua opinião é genuinamente importante para nós. Ela ajuda-nos a continuar a oferecer uma experiência única junto à Ria Formosa e desde a infinitude do Sul.</p>
+    <p id="email-note" style="display:none;font-size:13px;color:var(--gold-dark);background:var(--gold-light);padding:10px 16px;border-radius:8px;max-width:500px;margin:0 auto 1rem;text-wrap:balance;">Enviámos um resumo das suas respostas para o seu email.</p>
+    <p style="font-size:13px;">Esperamos ter o prazer de o/a receber novamente na Ria Endless South.</p>
+    <div id="resumo" style="text-align:left;margin-top:2rem;background:var(--card);border:0.5px solid var(--border);border-radius:12px;overflow:hidden;max-width:560px;margin-left:auto;margin-right:auto;"></div>
+  </div>
+
+  <div class="nav-row" id="nav-row">
+    <button class="btn" id="btn-back" onclick="navigate(-1)" style="visibility:hidden">← Anterior</button>
+    <span class="step-count" id="step-count">1 de 6</span>
+    <button class="btn btn-primary" id="btn-next" onclick="navigate(1)">Seguinte →</button>
+  </div>
+
+  <div class="footer">
+    Ria Endless South · Cabanas de Tavira · Algarve
+  </div>
+
+</div><!-- /page -->
+
+<script>
+  // =============================================
+  // CONFIGURAÇÃO — substitua pelo seu URL do Apps Script
+  // Veja as instruções no ficheiro: instrucoes-google-sheets.md
+  // =============================================
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwXLJT5ss7hvRUMLqyT-4Zq1g9o9iVnbFc46XEqKHPHQomSC3i9P_t601XJU5zj18Z0/exec";
+  // =============================================
+
+  const TOTAL = 6;
+  let current = 0;
+  const state = {};
+
+  function renderProgress() {
+    const pb = document.getElementById('progress');
+    pb.innerHTML = '';
+    for (let i = 0; i < TOTAL; i++) {
+      const s = document.createElement('div');
+      s.className = 'seg' + (i < current ? ' done' : i === current ? ' active' : '');
+      pb.appendChild(s);
+    }
+  }
+
+  function navigate(dir) {
+    if (dir === 1 && current === TOTAL - 1) {
+      submitForm();
+      return;
+    }
+    document.getElementById('sec-' + current).classList.remove('active');
+    current = Math.max(0, Math.min(TOTAL - 1, current + dir));
+    document.getElementById('sec-' + current).classList.add('active');
+    document.getElementById('btn-back').style.visibility = current === 0 ? 'hidden' : 'visible';
+    document.getElementById('btn-next').textContent = current === TOTAL - 1 ? 'Concluir ✦' : 'Seguinte →';
+    document.getElementById('step-count').textContent = (current + 1) + ' de ' + TOTAL;
+    renderProgress();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  const starLabels = ['', 'Muito fraco', 'Fraco', 'Razoável', 'Bom', 'Excelente'];
+
+  document.querySelectorAll('.star-row').forEach(row => {
+    const group = row.dataset.group;
+    const stars = row.querySelectorAll('.star');
+    stars.forEach(star => {
+      star.addEventListener('click', () => {
+        const v = parseInt(star.dataset.v);
+        state['star_' + group] = v;
+        stars.forEach(s => s.classList.toggle('lit', parseInt(s.dataset.v) <= v));
+        const lbl = document.getElementById('lbl-' + group);
+        if (lbl) lbl.textContent = starLabels[v];
+      });
+    });
+  });
+
+  document.querySelectorAll('.smiley-row').forEach(row => {
+    row.querySelectorAll('.smiley-opt').forEach(opt => {
+      opt.addEventListener('click', () => {
+        row.querySelectorAll('.smiley-opt').forEach(o => o.classList.remove('sel'));
+        opt.classList.add('sel');
+        state['smil_' + row.id] = opt.dataset.v;
+      });
+    });
+  });
+
+  document.querySelectorAll('.check-grid').forEach(grid => {
+    grid.querySelectorAll('.check-item').forEach(item => {
+      item.addEventListener('click', () => { item.classList.toggle('sel'); });
+    });
+  });
+
+  document.querySelectorAll('.nps-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.nps-btn').forEach(b => b.classList.remove('sel'));
+      btn.classList.add('sel');
+      state['nps'] = btn.dataset.v;
+    });
+  });
+
+  ['consent-1', 'consent-2', 'consent-3'].forEach(id => {
+    const row = document.getElementById(id);
+    if (row) row.addEventListener('click', () => {
+      ['consent-1', 'consent-2', 'consent-3'].forEach(cid => document.getElementById(cid).classList.remove('sel'));
+      row.classList.add('sel');
+      state['consent'] = row.dataset.v;
+    });
+  });
+
+  function getChecked(gridId) {
+    return Array.from(document.querySelectorAll('#' + gridId + ' .check-item.sel'))
+      .map(el => el.dataset.v).join(', ');
+  }
+
+  function val(id) {
+    const el = document.getElementById(id);
+    return el ? el.value.trim() : '';
+  }
+
+  const starLabelsMap = ['', 'Muito fraco', 'Fraco', 'Razoável', 'Bom', 'Excelente'];
+
+  function starsHtml(n) {
+    if (!n) return '<span style="color:var(--muted);font-size:12px;">—</span>';
+    let s = '';
+    for (let i = 1; i <= 5; i++) s += `<span style="color:${i<=n?'var(--gold)':'var(--border)'};font-size:15px;">★</span>`;
+    s += `<span style="font-size:12px;color:var(--muted);margin-left:6px;">${starLabelsMap[n]}</span>`;
+    return s;
+  }
+
+  function renderResumo(data) {
+    const sections = [
+      {
+        title: 'A sua visita',
+        rows: [
+          ['Nome', data.nome],
+          ['Data de entrada', data.data_entrada],
+          ['Data de saída', data.data_saida],
+          ['Noites', data.noites],
+          ['Tipo de grupo', data.tipo_grupo],
+        ]
+      },
+      {
+        title: 'O espaço',
+        rows: [
+          ['Quartos', starsHtml(data.quartos)],
+          ['Casas de banho', starsHtml(data.wc)],
+          ['Cozinha', starsHtml(data.cozinha)],
+          ['Sala de estar', starsHtml(data.sala)],
+          ['Varandas', starsHtml(data.varandas)],
+          ['Alpendre / pátio', starsHtml(data.patio)],
+          ['Estacionamento', starsHtml(data.estacionamento)],
+          ['Limpeza geral', starsHtml(data.limpeza)],
+          ['Observações', data.esp_obs],
+        ]
+      },
+      {
+        title: 'Serviço e comunicação',
+        rows: [
+          ['Acessibilidade', starsHtml(data.acessibilidade)],
+          ['Check-in', starsHtml(data.checkin)],
+          ['Check-out', starsHtml(data.checkout)],
+          ['Assistência', data.assistencia_usou === 'sim' ? starsHtml(data.assistencia) : 'Não necessitou'],
+          ['Informações fornecidas', starsHtml(data.informacoes)],
+          ['Observações', data.serv_obs],
+        ]
+      },
+      {
+        title: 'Natureza e percursos',
+        rows: [
+          ['Percurso pedestre', data.percurso_usou],
+          ['Avaliação percurso', starsHtml(data.percurso)],
+          ['Acesso à Ria', data.acesso_usou],
+          ['Caminho até Cabanas', data.cabanas],
+          ['Ria Formosa — geral', starsHtml(data.ria)],
+          ['Observações', data.nat_obs],
+        ]
+      },
+      {
+        title: 'Satisfação geral',
+        rows: [
+          ['Classificação global', starsHtml(data.global)],
+          ['Recomendação (NPS)', data.nps ? data.nps + ' / 10' : '—'],
+          ['O que mais apreciou', data.apreciou],
+          ['Observações', data.geral_obs],
+        ]
+      },
+      {
+        title: 'Testemunho',
+        rows: [
+          ['Texto', data.review_texto],
+          ['Nome público', data.review_nome],
+          ['Autorização', data.consent === 'total' ? 'Divulgação total autorizada' : data.consent === 'parcial' ? 'Divulgação sem identificação' : 'Apenas uso interno'],
+          ['Plataformas', data.plataformas],
+          ['Nota final', data.final_obs],
+        ]
+      }
+    ];
+
+    let html = `<div style="padding:1.25rem 1.5rem;border-bottom:0.5px solid var(--border);background:var(--surface);">
+      <div style="font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);margin-bottom:4px;">Resumo da avaliação</div>
+      <div style="font-size:13px;color:var(--muted);">Submetido em ${data.timestamp}</div>
+    </div>`;
+
+    sections.forEach(sec => {
+      const validRows = sec.rows.filter(([, v]) => v && v !== '—' && v !== '');
+      if (!validRows.length) return;
+      html += `<div style="padding:1rem 1.5rem;border-bottom:0.5px solid var(--border);">
+        <div style="font-size:11px;letter-spacing:0.13em;text-transform:uppercase;color:var(--gold);margin-bottom:0.75rem;">${sec.title}</div>
+        <table style="width:100%;border-collapse:collapse;">`;
+      validRows.forEach(([label, value]) => {
+        if (!value) return;
+        html += `<tr>
+          <td style="font-size:12.5px;color:var(--muted);padding:4px 12px 4px 0;vertical-align:top;white-space:nowrap;width:40%;">${label}</td>
+          <td style="font-size:13px;color:var(--ink);padding:4px 0;vertical-align:top;line-height:1.5;">${value}</td>
+        </tr>`;
+      });
+      html += `</table></div>`;
+    });
+
+    document.getElementById('resumo').innerHTML = html;
+  }
+
+  function submitForm() {
+    const data = {
+      timestamp: new Date().toLocaleString('pt-PT'),
+      nome: val('nome'),
+      email: val('email'),
+      data_entrada: val('data_entrada'),
+      data_saida: val('data_saida'),
+      noites: val('noites'),
+      tipo_grupo: state['smil_tipo-grupo'] || '',
+      quartos: state['star_quartos'] || '',
+      wc: state['star_wc'] || '',
+      cozinha: state['star_cozinha'] || '',
+      sala: state['star_sala'] || '',
+      varandas: state['star_varandas'] || '',
+      patio: state['star_patio'] || '',
+      estacionamento: state['star_estacionamento'] || '',
+      limpeza: state['star_limpeza'] || '',
+      esp_obs: val('esp_obs'),
+      acessibilidade: state['star_acessibilidade'] || '',
+      checkin: state['star_checkin'] || '',
+      checkout: state['star_checkout'] || '',
+      assistencia_usou: state['smil_usou-assistencia'] || '',
+      assistencia: state['star_assistencia'] || '',
+      informacoes: state['star_informacoes'] || '',
+      serv_obs: val('serv_obs'),
+      percurso_usou: state['smil_usou-percurso'] || '',
+      percurso: state['star_percurso'] || '',
+      acesso_usou: state['smil_usou-acesso'] || '',
+      cabanas: state['smil_caminhou-cabanas'] || '',
+      ria: state['star_ria'] || '',
+      nat_obs: val('nat_obs'),
+      global: state['star_global'] || '',
+      nps: state['nps'] || '',
+      apreciou: getChecked('apreciou'),
+      geral_obs: val('geral_obs'),
+      review_texto: val('review_texto'),
+      review_nome: val('review_nome'),
+      consent: state['consent'] || '',
+      plataformas: getChecked('plataformas'),
+      final_obs: val('final_obs'),
+    };
+
+    document.getElementById('form-wrap').style.display = 'none';
+    document.getElementById('nav-row').style.display = 'none';
+    document.getElementById('sending-msg').style.display = 'block';
+
+    fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify(data)
+    })
+    .then(() => showConfirmation(data))
+    .catch(() => showConfirmation(data));
+  }
+
+  function showConfirmation(data) {
+    document.getElementById('sending-msg').style.display = 'none';
+    document.getElementById('thankyou').style.display = 'block';
+    document.getElementById('progress').style.display = 'none';
+    if (data.email) {
+      document.getElementById('email-note').style.display = 'block';
+    }
+    renderResumo(data);
+  }
+
+  renderProgress();
+</script>
+</body>
+</html>
